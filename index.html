@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Class | المنصة التعليمية الذكية - الثالث الابتدائي</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .back-btn-kid {
+            width: 50px; height: 50px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; box-shadow: 0 6px 14px rgba(245, 158, 11, 0.4);
+            transition: all 0.2s ease-in-out; cursor: pointer; flex-shrink: 0;
+        }
+        .back-btn-kid:active { transform: scale(0.9); }
+        canvas { touch-action: none; }
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+        .sticker-img { object-fit: contain; filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.12)); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white/95 backdrop-blur-md shadow-sm border-b sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-2.5 flex justify-between items-center">
+            
+            <!-- Logo -->
+            <div class="flex items-center space-x-3 space-x-reverse cursor-pointer" onclick="navigateTo('landing')">
+                <div class="bg-gradient-to-tr from-indigo-600 to-violet-600 text-white p-2 rounded-2xl shadow-md">
+                    <i class="fa-solid fa-graduation-cap text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-black text-indigo-950 leading-none">Smart Class</h1>
+                    <span class="text-[10px] text-indigo-500 font-bold" id="lang-sub-title">منصة التعليم التفاعلي • المنهج العراقي</span>
+                </div>
+            </div>
+
+            <!-- Left Controls -->
+            <div class="flex items-center gap-3">
+                <!-- Language Switcher -->
+                <button onclick="toggleLanguage()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-xl text-xs border border-slate-200">
+                    <span id="lang-btn-text">English</span>
+                </button>
+
+                <!-- Student Top Status -->
+                <div id="student-top-bar" class="hidden items-center gap-2">
+                    <button onclick="navigateTo('store')" class="bg-amber-100 text-amber-900 font-extrabold px-3 py-1.5 rounded-2xl text-xs flex items-center gap-1 border border-amber-300 shadow-sm">
+                        <span>⭐ <span id="user-points">350</span></span>
+                    </button>
+                    <button onclick="logout()" class="text-rose-600 font-bold text-xs p-1" title="خروج">
+                        <i class="fa-solid fa-right-from-bracket text-base"></i>
+                    </button>
+                </div>
+
+                <!-- Staff Top Status -->
+                <div id="staff-top-bar" class="hidden items-center gap-2">
+                    <span id="staff-role-badge" class="bg-indigo-100 text-indigo-900 font-extrabold px-3 py-1 rounded-xl text-xs">معلم</span>
+                    <button onclick="logout()" class="text-rose-600 font-bold text-xs p-1">
+                        <i class="fa-solid fa-right-from-bracket text-base"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- App Main Shell -->
+    <main class="max-w-5xl mx-auto p-4 flex-grow w-full">
+
+        <!-- 1️⃣ Landing Page -->
+        <section id="page-landing" class="page-section active space-y-8">
+            <div class="text-center space-y-4 max-w-2xl mx-auto pt-4">
+                <span class="bg-indigo-100 text-indigo-800 font-extrabold px-4 py-1.5 rounded-full text-xs border border-indigo-200 inline-block shadow-sm" id="landing-badge">
+                    ✨ المنصة التعليمية التفاعلية المعتمدة للمدارس الابتدائية
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-black text-slate-900 leading-tight" id="landing-title">
+                    حول التعلم إلى رحلة ممتعة وتفاعلية لأبطال المستقبل 🚀
+                </h2>
+                <p class="text-slate-600 text-sm font-medium">اختر صفة الدخول للبدء بالتجربة:</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                    <button onclick="navigateTo('login-student')" class="p-5 bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-3xl shadow-lg transition transform hover:-translate-y-1 flex flex-col items-center justify-center gap-2">
+                        <span class="text-4xl">👧🏻👦🏻</span>
+                        <span class="text-lg font-extrabold" id="btn-role-student">دخول الطالب</span>
+                    </button>
+
+                    <button onclick="navigateTo('login-teacher')" class="p-5 bg-white text-slate-800 border-2 border-slate-200 rounded-3xl shadow-sm transition transform hover:-translate-y-1 flex flex-col items-center justify-center gap-2">
+                        <span class="text-4xl">👩‍🏫</span>
+                        <span class="text-lg font-extrabold" id="btn-role-teacher">دخول المعلم</span>
+                    </button>
+
+                    <button onclick="navigateTo('login-admin')" class="p-5 bg-white text-slate-800 border-2 border-slate-200 rounded-3xl shadow-sm transition transform hover:-translate-y-1 flex flex-col items-center justify-center gap-2">
+                        <span class="text-4xl">🏫</span>
+                        <span class="text-lg font-extrabold" id="btn-role-admin">إدارة المدرسة</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2️⃣ Student Login -->
+        <section id="page-login-student" class="page-section max-w-md mx-auto py-4">
+            <div class="bg-white p-6 rounded-3xl border shadow-xl space-y-4">
+                <div class="text-center space-y-1">
+                    <img id="login-avatar-preview" src="https://cdn-icons-png.flaticon.com/512/4140/4140047.png" class="w-20 h-20 mx-auto sticker-img" alt="avatar">
+                    <h2 class="text-2xl font-bold text-slate-800">مرحباً بك يا بطل! 👧🏻👦🏻</h2>
+                </div>
+
+                <form onsubmit="handleStudentLogin(event)" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">المظهر والملصقات</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="p-2 border-2 border-pink-200 bg-pink-50 rounded-2xl flex items-center justify-center gap-2 cursor-pointer">
+                                <input type="radio" name="student-gender" value="girl" checked onchange="setGender('girl')" class="accent-pink-600">
+                                <span class="font-bold text-xs text-pink-900">👧🏻 بنت</span>
+                            </label>
+                            <label class="p-2 border-2 border-blue-200 bg-blue-50 rounded-2xl flex items-center justify-center gap-2 cursor-pointer">
+                                <input type="radio" name="student-gender" value="boy" onchange="setGender('boy')" class="accent-blue-600">
+                                <span class="font-bold text-xs text-blue-900">👦🏻 ولد</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">اسم الطالب</label>
+                        <input type="text" id="student-name-input" required value="سارة العبيدي" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none font-semibold text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">كلمة المرور (PIN)</label>
+                        <input type="password" required value="1234" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none font-semibold text-sm">
+                    </div>
+
+                    <button type="submit" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-md text-sm">
+                        دخول إلى صف الطالب 🚀
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 2️⃣ Teacher Login -->
+        <section id="page-login-teacher" class="page-section max-w-md mx-auto py-4">
+            <div class="bg-white p-6 rounded-3xl border shadow-xl space-y-4">
+                <div class="text-center space-y-1">
+                    <span class="text-5xl">👩‍🏫</span>
+                    <h2 class="text-xl font-bold text-slate-800">بوابة المعلمين</h2>
+                </div>
+                <form onsubmit="handleStaffLogin(event, 'teacher')" class="space-y-3">
+                    <input type="text" required value="teacher" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 font-semibold text-sm" placeholder="اسم المستخدم">
+                    <input type="password" required value="demo" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 font-semibold text-sm" placeholder="كلمة المرور">
+                    <button type="submit" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-md text-sm">
+                        دخول لوحة المعلم 📊
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 2️⃣ Admin Login -->
+        <section id="page-login-admin" class="page-section max-w-md mx-auto py-4">
+            <div class="bg-white p-6 rounded-3xl border shadow-xl space-y-4">
+                <div class="text-center space-y-1">
+                    <span class="text-5xl">🏫</span>
+                    <h2 class="text-xl font-bold text-slate-800">بوابة إدارة المدرسة</h2>
+                </div>
+                <form onsubmit="handleStaffLogin(event, 'admin')" class="space-y-3">
+                    <input type="text" required value="admin" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 font-semibold text-sm" placeholder="اسم المستخدم">
+                    <input type="password" required value="demo" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 font-semibold text-sm" placeholder="كلمة المرور">
+                    <button type="submit" class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl shadow-md text-sm">
+                        دخول لوحة الإدارة 📈
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 3️⃣ Student Dashboard -->
+        <section id="page-dashboard" class="page-section space-y-6">
+            <div class="bg-gradient-to-r from-indigo-700 to-purple-800 text-white p-5 rounded-3xl shadow-lg flex justify-between items-center">
+                <div>
+                    <span class="text-xs text-indigo-200">مدرسة الأمل الابتدائية • الصف الثالث (أ)</span>
+                    <h2 class="text-2xl font-black flex items-center gap-2 mt-1">
+                        أهلاً بك، <span id="welcome-name">سارة</span>
+                        <img id="dash-gender-sticker" src="https://cdn-icons-png.flaticon.com/512/744/744922.png" class="w-8 h-8 sticker-img" alt="sticker">
+                    </h2>
+                </div>
+                <div class="text-left bg-white/10 p-3 rounded-2xl border border-white/20">
+                    <span class="text-xs text-indigo-200 block font-bold">النقاط ⭐</span>
+                    <span id="dash-points" class="text-xl font-black text-amber-300">350</span>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="navigateTo('challenge')" class="p-4 bg-gradient-to-r from-amber-400 to-orange-500 text-white rounded-2xl font-extrabold text-sm flex items-center justify-between shadow-sm">
+                    <span>🔥 التحدي اليومي (+50)</span>
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button onclick="openWhiteboard()" class="p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl font-extrabold text-sm flex items-center justify-between shadow-sm">
+                    <span>🎨 السبورة الذكية</span>
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+            </div>
+
+            <!-- Subjects Grid -->
+            <div class="space-y-3">
+                <h3 class="font-black text-slate-800 text-lg">📘 المواد الدراسية</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div onclick="openSubject('english')" class="bg-white p-4 rounded-2xl border shadow-sm cursor-pointer hover:border-indigo-400 transition flex items-center gap-3">
+                        <span class="text-4xl">📘</span>
+                        <div>
+                            <h4 class="font-bold text-slate-800">اللغة الإنجليزية (English)</h4>
+                            <span class="text-xs text-slate-400 font-semibold">الوحدة 1 و 2</span>
+                        </div>
+                    </div>
+                    <div onclick="openSubject('math')" class="bg-white p-4 rounded-2xl border shadow-sm cursor-pointer hover:border-indigo-400 transition flex items-center gap-3">
+                        <span class="text-4xl">🧮</span>
+                        <div>
+                            <h4 class="font-bold text-slate-800">الرياضيات</h4>
+                            <span class="text-xs text-slate-400 font-semibold">الأعداد والقيمة المكانية</span>
+                        </div>
+                    </div>
+                    <div onclick="openSubject('science')" class="bg-white p-4 rounded-2xl border shadow-sm cursor-pointer hover:border-indigo-400 transition flex items-center gap-3">
+                        <span class="text-4xl">🔬</span>
+                        <div>
+                            <h4 class="font-bold text-slate-800">العلوم</h4>
+                            <span class="text-xs text-slate-400 font-semibold">التغذية والبناء الضوئي</span>
+                        </div>
+                    </div>
+                    <div onclick="openSubject('arabic')" class="bg-white p-4 rounded-2xl border shadow-sm cursor-pointer hover:border-indigo-400 transition flex items-center gap-3">
+                        <span class="text-4xl">📗</span>
+                        <div>
+                            <h4 class="font-bold text-slate-800">القراءة العربية</h4>
+                            <span class="text-xs text-slate-400 font-semibold">التاء المربوطة والمفتوحة</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4️⃣ Dynamic Subject View -->
+        <section id="page-units" class="page-section space-y-4 max-w-3xl mx-auto">
+            <div class="flex items-center gap-3 border-b pb-3">
+                <button onclick="navigateTo('dashboard')" class="back-btn-kid bg-amber-400 text-amber-950 font-black">→</button>
+                <h2 id="subject-title" class="text-xl font-black text-slate-800">اسم المادة</h2>
+            </div>
+            <div id="units-container" class="space-y-3"></div>
+        </section>
+
+        <!-- 5️⃣ Lesson View -->
+        <section id="page-lesson" class="page-section space-y-4 max-w-2xl mx-auto">
+            <button onclick="navigateTo('units')" class="back-btn-kid bg-amber-400 text-amber-950 font-black">→</button>
+            <div id="lesson-content-card" class="bg-white p-5 rounded-3xl border shadow-sm space-y-3"></div>
+            <div class="bg-white p-5 rounded-3xl border shadow-sm space-y-4">
+                <h3 class="font-extrabold text-slate-800 text-base">🎯 اختبر نفسك الآن (+10 نقاط)</h3>
+                <div id="quiz-container" class="space-y-4"></div>
+            </div>
+        </section>
+
+        <!-- 6️⃣ Interactive Whiteboard -->
+        <section id="page-whiteboard" class="page-section space-y-3 max-w-2xl mx-auto">
+            <div class="flex items-center justify-between border-b pb-2">
+                <button onclick="navigateTo('dashboard')" class="back-btn-kid bg-amber-400 text-amber-950 font-black">→</button>
+                <div class="flex items-center gap-2">
+                    <button onclick="setPenColor('#2563eb')" class="w-7 h-7 rounded-full bg-blue-600 border-2 border-white shadow"></button>
+                    <button onclick="setPenColor('#dc2626')" class="w-7 h-7 rounded-full bg-red-600 border-2 border-white shadow"></button>
+                    <button onclick="setPenColor('#16a34a')" class="w-7 h-7 rounded-full bg-green-600 border-2 border-white shadow"></button>
+                    <button onclick="clearCanvas()" class="px-3 py-1 bg-rose-100 text-rose-700 font-bold rounded-lg text-xs">مسح الكل</button>
+                </div>
+            </div>
+            <div class="bg-white p-2 rounded-2xl border-2 border-indigo-200 shadow-inner">
+                <canvas id="paint-canvas" width="600" height="350" class="w-full bg-amber-50/20 rounded-xl cursor-crosshair"></canvas>
+            </div>
+        </section>
+
+        <!-- 7️⃣ Rewards Store -->
+        <section id="page-store" class="page-section space-y-4 max-w-2xl mx-auto">
+            <div class="flex items-center justify-between border-b pb-3">
+                <button onclick="navigateTo('dashboard')" class="back-btn-kid bg-amber-400 text-amber-950 font-black">→</button>
+                <div class="bg-amber-100 text-amber-900
