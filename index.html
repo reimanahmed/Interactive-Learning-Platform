@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="html-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Class | المنصة التعليمية الذكية - المنهج العراقي</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+        .back-btn-kid {
+            width: 52px; height: 52px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; box-shadow: 0 6px 14px rgba(245, 158, 11, 0.4);
+            transition: all 0.2s ease-in-out; cursor: pointer; flex-shrink: 0;
+        }
+        .back-btn-kid:active { transform: scale(0.9); }
+        canvas { touch-action: none; }
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+        .sticker-img { object-fit: contain; filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.12)); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white/95 backdrop-blur-md shadow-sm border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-2.5 flex justify-between items-center">
+            
+            <!-- Logo -->
+            <div class="flex items-center space-x-3 space-x-reverse cursor-pointer" onclick="navigateTo('landing')">
+                <div class="bg-gradient-to-tr from-indigo-600 to-violet-600 text-white p-2.5 rounded-2xl shadow-md">
+                    <i class="fa-solid fa-graduation-cap text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-black text-indigo-950 leading-none tracking-tight">Smart Class</h1>
+                    <span class="text-[10px] text-indigo-500 font-bold" id="lang-sub-title">منصة التعليم التفاعلي • المنهج العراقي</span>
+                </div>
+            </div>
+
+            <!-- Left Controls: Language Switcher & User Status -->
+            <div class="flex items-center gap-3">
+                
+                <!-- Language Toggle Button -->
+                <button onclick="toggleLanguage()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1.5 transition border border-slate-200">
+                    <i class="fa-solid fa-globe text-indigo-600"></i>
+                    <span id="lang-btn-text">English</span>
+                </button>
+
+                <!-- Student Top Bar (When Student Logged In) -->
+                <div id="student-top-bar" class="hidden items-center gap-2">
+                    <button onclick="navigateTo('store')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 font-extrabold px-3 py-1.5 rounded-2xl text-xs flex items-center gap-1 transition border border-amber-300 shadow-sm">
+                        <i class="fa-solid fa-store text-amber-600"></i>
+                        <span id="txt-nav-store">المتجر</span> (<span id="user-points">350</span> ⭐)
+                    </button>
+                    <div class="bg-indigo-50 text-indigo-800 font-extrabold px-3 py-1.5 rounded-2xl text-xs flex items-center gap-1 border border-indigo-200">
+                        <i class="fa-solid fa-trophy text-amber-500"></i>
+                        <span id="txt-nav-level">مستوى</span> <span id="user-level">4</span>
+                    </div>
+                    <div class="flex items-center gap-1 border-r pr-2 border-slate-200">
+                        <img id="user-avatar-display" src="https://cdn-icons-png.flaticon.com/512/4140/4140047.png" class="w-8 h-8 rounded-full border-2 border-indigo-400 p-0.5 bg-indigo-50" alt="avatar">
+                        <button onclick="logout()" class="text-slate-400 hover:text-rose-600 text-xs font-bold p-1" title="خروج">
+                            <i class="fa-solid fa-right-from-bracket text-base"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Teacher / Admin Logout Button -->
+                <div id="staff-top-bar" class="hidden items-center gap-2">
+                    <span id="staff-role-badge" class="bg-indigo-100 text-indigo-900 font-extrabold px-3 py-1 rounded-xl text-xs">معلم</span>
+                    <button onclick="logout()" class="text-slate-400 hover:text-rose-600 text-xs font-bold p-1">
+                        <i class="fa-solid fa-right-from-bracket text-base"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- 1️⃣ Landing Page (Hero & Role Selection) -->
+        <section id="page-landing" class="page-section active space-y-12">
+            <div class="text-center space-y-6 max-w-3xl mx-auto pt-6">
+                <span class="bg-indigo-100 text-indigo-800 font-extrabold px-4 py-1.5 rounded-full text-xs border border-indigo-200 inline-block shadow-sm" id="landing-badge">
+                    ✨ المنصة التعليمية التفاعلية المعتمدة للمدارس الابتدائية
+                </span>
+                <h2 class="text-3xl md:text-5xl font-black text-slate-900 leading-tight" id="landing-title">
+                    حول التعلم إلى رحلة ممتعة وتفاعلية لأبطال المستقبل 🚀
+                </h2>
+                <p class="text-slate-600 text-base md:text-lg font-medium" id="landing-desc">
+                    منصة تعليمیة متكاملة تجمع بين التحفيز بالألعاب (Gamification) والمناهج الوزارية العراقية للصف الثالث الابتدائي.
+                </p>
+                
+                <!-- Role Selection Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-4">
+                    <button onclick="navigateTo('login-student')" class="p-6 bg-gradient-to-br from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-3xl shadow-xl transition transform hover:-translate-y-1 flex flex-col items-center justify-center gap-3">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3408/3408506.png" class="w-16 h-16 sticker-img" alt="students">
+                        <span class="text-xl font-extrabold" id="btn-role-student">دخول الطالب</span>
+                        <span class="text-xs text-indigo-100 font-medium">ابدأ مغامرة التعلم والتحدي</span>
+                    </button>
+
+                    <button onclick="navigateTo('login-teacher')" class="p-6 bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-200 rounded-3xl shadow-sm transition transform hover:-translate-y-1 flex flex-col items-center justify-center gap-3">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1995/1995539.png" class="w-16 h-16 sticker-img" alt="teacher">
+                        <span class="text-xl font-extrabold" id="btn-role-teacher">دخول المعلم</span>
+                        <span class="text-xs text-slate-400 font-medium">متابعة الفصول والواجبات</span>
+                    </button>
+
+                    <button onclick="navigateTo('login-admin')" class="p-6 bg-white hover:bg-slate-50 text-slate-800 border-2 border-slate-200 rounded-3xl shadow-sm transition transform hover:-translate-y-1 flex flex-col items-center justify-center gap-3">
+                        <img src="https://cdn-icons-png.flaticon.com/512/167/167707.png" class="w-16 h-16 sticker-img" alt="school">
+                        <span class="text-xl font-extrabold" id="btn-role-admin">دخول إدارة المدرسة</span>
+                        <span class="text-xs text-slate-400 font-medium">إدارة الشُعب والتقارير الشاملة</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Features Summary -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 pt-8 border-t">
+                <div class="bg-white p-5 rounded-2xl border shadow-sm text-center space-y-2">
+                    <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-xl mx-auto"><i class="fa-solid fa-gamepad"></i></div>
+                    <h3 class="font-bold text-base">نظام نقاط وأوسمة</h3>
+                    <p class="text-slate-500 text-xs">تحفيز مستمر للطالب لإكمال الدروس والحصول على ألقاب مميزة.</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border shadow-sm text-center space-y-2">
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-xl mx-auto"><i class="fa-solid fa-store"></i></div>
+                    <h3 class="font-bold text-base">متجر ملصقات الأفاتار</h3>
+                    <p class="text-slate-500 text-xs">استبدال النقاط بشراء ملصقات واكسسوارات كارتونية لشخصية الطالب.</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border shadow-sm text-center space-y-2">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-xl mx-auto"><i class="fa-solid fa-book-bookmark"></i></div>
+                    <h3 class="font-bold text-base">المنهج العراقي الكامل</h3>
+                    <p class="text-slate-500 text-xs">تغطية شاملة لأول فصلين لكافة مواد الثالث الابتدائي.</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border shadow-sm text-center space-y-2">
+                    <div class="w-12 h-12 bg-sky-100 text-sky-600 rounded-2xl flex items-center justify-center text-xl mx-auto"><i class="fa-solid fa-chart-pie"></i></div>
+                    <h3 class="font-bold text-base">تقارير ودعم للمعلم</h3>
+                    <p class="text-slate-500 text-xs">تقارير دقيقة وتنبيهات فورية للطلاب المتراجعين لتقديم الدعم.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2️⃣ Login: Student -->
+        <section id="page-login-student" class="page-section max-w-md mx-auto py-6">
+            <div class="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
+                <div class="text-center space-y-2">
+                    <img id="login-avatar-preview" src="https://cdn-icons-png.flaticon.com/512/4140/4140047.png" class="w-24 h-24 mx-auto sticker-img" alt="avatar">
+                    <h2 class="text-2xl font-bold text-slate-800">مرحباً بك يا بطل! 👧🏻👦🏻</h2>
+                    <p class="text-slate-500 text-xs font-semibold">اختر جنسك وأدخل رمز مدرستك واسمك للبدء</p>
+                </div>
+
+                <form onsubmit="handleStudentLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-2">جنس الطالب (حدد المظهر والملصقات)</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="p-3 border-2 border-pink-200 bg-pink-50/50 rounded-2xl flex items-center justify-center gap-2 cursor-pointer hover:bg-pink-100 transition">
+                                <input type="radio" name="student-gender" value="girl" checked onchange="setGender('girl')" class="accent-pink-600">
+                                <span class="font-bold text-sm text-pink-900">👧🏻 بنت (Girl)</span>
+                            </label>
+                            <label class="p-3 border-2 border-blue-200 bg-blue-50/50 rounded-2xl flex items-center justify-center gap-2 cursor-pointer hover:bg-blue-100 transition">
+                                <input type="radio" name="student-gender" value="boy" onchange="setGender('boy')" class="accent-blue-600">
+                                <span class="font-bold text-sm text-blue-900">👦🏻 ولد (Boy)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">كود المدرسة (School Code)</label>
+                        <input type="text" required value="IQ-BAGHDAD-01" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none transition font-semibold text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">اسم الطالب / المعرف</label>
+                        <input type="text" id="student-name-input" required value="سارة العبيدي" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none transition font-semibold text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">كلمة المرور</label>
+                        <input type="password" required value="123456" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none transition font-semibold text-sm">
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition text-base">
+                        دخول إلى صف الطالب 🚀
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 2️⃣ Login: Teacher -->
+        <section id="page-login-teacher" class="page-section max-w-md mx-auto py-6">
+            <div class="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
+                <div class="text-center space-y-2">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1995/1995539.png" class="w-20 h-20 mx-auto sticker-img" alt="teacher">
+                    <h2 class="text-2xl font-bold text-slate-800">بوابة المعلمين 👩‍🏫</h2>
+                    <p class="text-slate-500 text-xs font-semibold">سجل دخولك لمتابعة الفصول وتقييم الطلاب</p>
+                </div>
+
+                <form onsubmit="handleStaffLogin(event, 'teacher')" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">البريد الإلكتروني / اسم المستخدم</label>
+                        <input type="text" required value="teacher@smartclass.iq" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">كلمة المرور</label>
+                        <input type="password" required value="teacher123" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-sm">
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition text-base">
+                        دخول لوحة المعلم 📊
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 2️⃣ Login: Admin -->
+        <section id="page-login-admin" class="page-section max-w-md mx-auto py-6">
+            <div class="bg-white p-8 rounded-3xl border shadow-xl space-y-6">
+                <div class="text-center space-y-2">
+                    <img src="https://cdn-icons-png.flaticon.com/512/167/167707.png" class="w-20 h-20 mx-auto sticker-img" alt="admin">
+                    <h2 class="text-2xl font-bold text-slate-800">بوابة إدارة المدرسة 🏫</h2>
+                    <p class="text-slate-500 text-xs font-semibold">إدارة المنظومة التعليمية والتقارير الشاملة</p>
+                </div>
+
+                <form onsubmit="handleStaffLogin(event, 'admin')" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">رمز المدرسة / اسم المستخدم</label>
+                        <input type="text" required value="admin@school.iq" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">كلمة المرور الإدارية</label>
+                        <input type="password" required value="admin123" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-sm">
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg transition text-base">
+                        دخول لوحة الإدارة 📈
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 3️⃣ Student Dashboard -->
+        <section id="page-dashboard" class="page-section space-y-8">
+            <div class="bg-gradient-to-r from-indigo-700 via-indigo-800 to-purple-800 text-white p-6 sm:p-8 rounded-3xl shadow-lg flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden">
+                <div class="space-y-2 text-center md:text-right z-10">
+                    <div class="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full text-xs font-semibold text-indigo-200">
+                        <span>مدرسة الأمل الابتدائية</span> • <span>الصف الثالث (أ)</span>
+                    </div>
+                    <h2 class="text-3xl font-black flex items-center justify-center md:justify-start gap-2">
+                        أهلاً بك، <span id="welcome-name">سارة</span>
+                        <img id="dash-gender-sticker" src="https://cdn-icons-png.flaticon.com/512/744/744922.png" class="w-10 h-10 inline-block sticker-img" alt="sticker">
+                    </h2>
+                    <p class="text-indigo-200 text-xs sm:text-sm font-medium">أنت في الطريق الصحيح لنيل لقب الطالب المتميز لهذا الأسبوع!</p>
+                </div>
+                
+                <div class="flex flex-wrap gap-3 justify-center z-10">
+                    <div class="bg-white/10 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/20 text-center min-w-[90px]">
+                        <span class="text-xs text-indigo-200 block font-semibold">النقاط ⭐</span>
+                        <span id="dash-points" class="text-xl font-black text-amber-300">350</span>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/20 text-center min-w-[90px]">
+                        <span class="text-xs text-indigo-200 block font-semibold">المستوى 🏆</span>
+                        <span id="dash-level" class="text-xl font-black text-emerald-300">4</span>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/20 text-center min-w-[90px]">
+                        <span class="text-xs text-indigo-200 block font-semibold">التقدم 📈</span>
+                        <span class="text-xl font-black text-sky-300" id="dash-progress-val">68%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Action Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div onclick="navigateTo('challenge')" class="bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 hover:opacity-95 text-white p-4 rounded-2xl shadow-md cursor-pointer transition flex justify-between items-center px-6">
+                    <div class="flex items-center gap-3">
+                        <img src="https://cdn-icons-png.flaticon.com/512/785/785116.png" class="w-10 h-10 sticker-img animate-bounce" alt="fire">
+                        <div>
+                            <h4 class="font-extrabold text-base">التحدي اليومي السريع (Daily Challenge)</h4>
+                            <p class="text-xs text-amber-100 font-medium">أجب عن الأسئلة واكسب +50 نقطة إضافية ومباشرة!</p>
+                        </div>
+                    </div>
+                    <span class="bg-white text-orange-600 font-black px-4 py-2 rounded-xl text-xs shadow-sm">خوض التحدي 🎯</span>
+                </div>
+
+                <div onclick="openWhiteboard()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:opacity-95 text-white p-4 rounded-2xl shadow-md cursor-pointer transition flex justify-between items-center px-6">
+                    <div class="flex items-center gap-3">
+                        <img src="https://cdn-icons-png.flaticon.com/512/2682/2682065.png" class="w-10 h-10 sticker-img" alt="draw">
+                        <div>
+                            <h4 class="font-extrabold text-base">السبورة الذكية للكتابة والرسم (Interactive Board)</h4>
+                            <p class="text-xs text-emerald-100 font-medium">استخدم الأقلام والممسحة للتدرب على الحل اليدوي!</p>
+                        </div>
+                    </div>
+                    <span class="bg-white text-teal-700 font-black px-4 py-2 rounded-xl text-xs shadow-sm">افتتح السبورة ✍️</span>
+                </div>
+            </div>
+
+            <!-- Subjects Grid -->
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-book-open text-indigo-600"></i> المواد الدراسية (الصف الثالث الابتدائي)
+                    </h3>
+                    <span class="text-xs text-slate-400 font-semibold">المنهج العراقي المعتمد</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- English -->
+                    <div onclick="openSubject('english')" class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-4 border-t-4 border-t-blue-500 group">
+                        <div class="flex justify-between items-start">
+                            <img src="https://cdn-icons-png.flaticon.com/512/3898/3898082.png" class="w-12 h-12 sticker-img" alt="english">
+                            <span class="bg-blue-50 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-lg">الوحدة 1 و 2</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg text-slate-800 group-hover:text-blue-600 transition">اللغة الإنجليزية (English)</h4>
+                            <p class="text-slate-400 text-xs font-medium">English for Iraq - Grade 3</p>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs text-slate-500 font-semibold">
+                                <span>التقدم</span>
+                                <span>80%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2">
+                                <div class="bg-blue-500 h-2 rounded-full" style="width: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mathematics -->
+                    <div onclick="openSubject('math')" class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-4 border-t-4 border-t-rose-500 group">
+                        <div class="flex justify-between items-start">
+                            <img src="https://cdn-icons-png.flaticon.com/512/3771/3771278.png" class="w-12 h-12 sticker-img" alt="math">
+                            <span class="bg-rose-50 text-rose-700 text-xs font-bold px-2.5 py-1 rounded-lg">الفصل 1 و 2</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg text-slate-800 group-hover:text-rose-600 transition">الرياضيات</h4>
+                            <p class="text-slate-400 text-xs font-medium">الأعداد حتى 9999 والجمع والطرح</p>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs text-slate-500 font-semibold">
+                                <span>التقدم</span>
+                                <span>65%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2">
+                                <div class="bg-rose-500 h-2 rounded-full" style="width: 65%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Science -->
+                    <div onclick="openSubject('science')" class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-4 border-t-4 border-t-emerald-500 group">
+                        <div class="flex justify-between items-start">
+                            <img src="https://cdn-icons-png.flaticon.com/512/1046/1046241.png" class="w-12 h-12 sticker-img" alt="science">
+                            <span class="bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-lg">الفصل 1 و 2</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg text-slate-800 group-hover:text-emerald-600 transition">العلوم</h4>
+                            <p class="text-slate-400 text-xs font-medium">التغذية عند الأحياء قياس المادة</p>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs text-slate-500 font-semibold">
+                                <span>التقدم</span>
+                                <span>50%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2">
+                                <div class="bg-emerald-500 h-2 rounded-full" style="width: 50%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Arabic -->
+                    <div onclick="openSubject('arabic')" class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-4 border-t-4 border-t-amber-500 group">
+                        <div class="flex justify-between items-start">
+                            <img src="https://cdn-icons-png.flaticon.com/512/2232/2232688.png" class="w-12 h-12 sticker-img" alt="arabic">
+                            <span class="bg-amber-50 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-lg">الفصل 1 و 2</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg text-slate-800 group-hover:text-amber-600 transition">القراءة العربية</h4>
+                            <p class="text-slate-400 text-xs font-medium">القراءة والمحفوظات والإملاء</p>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs text-slate-500 font-semibold">
+                                <span>التقدم</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2">
+                                <div class="bg-amber-500 h-2 rounded-full" style="width: 75%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Islamic Studies -->
+                    <div onclick="openSubject('islamic')" class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between space-y-4 border-t-4 border-t-teal-500 group">
+                        <div class="flex justify-between items-start">
+                            <img src="https://cdn-icons-png.flaticon.com/512/2904/2904843.png" class="w-12 h-12 sticker-img" alt="islamic">
+                            <span class="bg-teal-50 text-teal-700 text-xs font-bold px-2.5 py-1 rounded-lg">الوحدة 1 و 2</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg text-slate-800 group-hover:text-teal-600 transition">التربية الإسلامية</h4>
+                            <p class="text-slate-400 text-xs font-medium">القرآن الكريم والسيرة النبوية</p>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs text-slate-500 font-semibold">
+                                <span>التقدم</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2">
+                                <div class="bg-teal-500 h-2 rounded-full" style="width: 90%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4️⃣ Dynamic Subject Units View -->
+        <section id="page-units" class="page-section space-y-6 max-w-4xl mx-auto">
+            <div class="flex items-center gap-4 border-b pb-4">
+                <button onclick="navigateTo('dashboard')" class="back-btn-kid bg-amber-400 hover:bg-amber-500 text-amber-950 font-black">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+                <div>
+                    <h2 id="subject-title" class="text-2xl font-black text-slate-800">اسم المادة</h2>
+                    <p class="text-slate-400 text-xs font-semibold">الفصول والدروس المقررة في المنهج العراقي</p>
+                </div>
+            </div>
+
+            <div id="units-container" class="space-y-4"></div>
+        </section>
+
+        <!-- 5️⃣ Lesson Content & Quiz Page -->
+        <section id="page-lesson" class="page-section space-y-6 max-w-3xl mx-auto">
+            <div class="flex items-center justify-between border-b pb-4">
+                <div class="flex items-center gap-3">
+                    <button onclick="navigateTo('units')" class="back-btn-kid bg-amber-400 hover:bg-amber-500 text-amber-950 font-black">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <span class="text-xs font-bold text-slate-500">الرجوع للوحدات</span>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <button onclick="openWhiteboard()" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-extrabold px-3 py-1.5 rounded-2xl text-xs flex items-center gap-1 border border-emerald-300">
+                        🎨 افتح السبورة
+                    </button>
+                    <span id="lesson-badge" class="bg-indigo-100 text-indigo-800 font-extrabold px-3 py-1.5 rounded-full text-xs">درس تفاعلي</span>
+                </div>
+            </div>
+
+            <!-- Lesson Explanation Body -->
+            <div id="lesson-content-card" class="bg-white p-6 sm:p-8 rounded-3xl border shadow-sm space-y-5 text-lg leading-relaxed"></div>
+
+            <!-- Interactive Quiz Section -->
+            <div class="bg-white p-6 sm:p-8 rounded-3xl border shadow-sm space-y-6">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <span class="font-extrabold text-slate-800 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-circle-question text-indigo-600"></i> اختبر فهمك الآن 🎯
+                    </span>
+                    <span class="text-xs bg-amber-100 text-amber-800 font-extrabold px-3 py-1 rounded-full">+10 نقاط لكل سؤال ⭐</span>
+                </div>
+
+                <div id="quiz-container" class="space-y-6"></div>
+            </div>
+        </section>
+
+        <!-- 6️⃣ Interactive Whiteboard Page -->
+        <section id="page-whiteboard" class="page-section space-y-4 max-w-3xl mx-auto">
+            <div class="flex items-center justify-between border-b pb-3 flex-wrap gap-2">
+                <div class="flex items-center gap-3">
+                    <button onclick="navigateTo('dashboard')" class="back-btn-kid bg-amber-400 hover:bg-amber-500 text-amber-950 font-black">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-xl font-black text-slate-800">السبورة التفاعلية 🎨✏️</h2>
+                        <p class="text-xs text-slate-400 font-semibold">اكتب، ارسم، وحل المسائل بخط يدك!</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="setPenColor('#2563eb')" class="w-8 h-8 rounded-full bg-blue-600 border-2 border-white shadow"></button>
+                    <button onclick="setPenColor('#dc2626')" class="w-8 h-8 rounded-full bg-red-600 border-2 border-white shadow"></button>
+                    <button onclick="setPenColor('#16a34a')" class="w-8 h-8 rounded-full bg-green-600 border-2 border-white shadow"></button>
+                    <button onclick="setPenColor('#000000')" class="w-8 h-8 rounded-full bg-black border-2 border-white shadow"></button>
+                    <button onclick="clearCanvas()" class="px-3 py-1.5 bg-rose-100 text-rose-700 font-bold rounded-xl text-xs border border-rose-200">
+                        <i class="fa-solid fa-trash ml-1"></i> مسح الكل
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white p-3 rounded-3xl border-4 border-indigo-200 shadow-inner flex justify-center items-center">
+                <canvas id="paint-canvas" width="650" height="400" class="w-full bg-amber-50/20 rounded-2xl cursor-crosshair border border-dashed border-slate-300"></canvas>
+            </div>
+        </section>
+
+        <!-- 7️⃣ Rewards & Avatar Store -->
+        <section id="page-store" class="page-section space-y-6 max-w-4xl mx-auto">
+            <div class="flex items-center justify-between border-b pb-4">
+                <div class="flex items-center gap-3">
+                    <button onclick="navigateTo('dashboard')" class="back-btn-kid bg-amber-400 hover:bg-amber-500 text-amber-950 font-black">
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-800">متجر المكافآت والملصقات 🛍️</h2>
+                        <p class="text-slate-400 text-xs font-semibold">استبدل نقاطك بملصقات وشخصيات كارتونية رائعة!</p>
+                    </div>
+                </div>
+                <div class="bg-amber-100 border border-amber-300 text-amber-900 font-black px-4 py-2 rounded-2xl text-sm flex items-center gap-1.5 shadow-sm">
+                    ⭐ <span id="store-points-val">350</span> نقطة متاحة
+                </div>
+            </div>
+
+            <!-- Avatar Customizer -->
+            <div class="bg-gradient-to-r from-violet-600 to-indigo-600 text-white p-6 rounded-3xl shadow-lg flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-6">
+                    <div class="w-28 h-28 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border-4 border-white/30 shadow-inner relative overflow-hidden">
+                        <img id="current-avatar" src="https://cdn-icons-png.flaticon.com/512/4140/4140047.png" class="w-20 h-20 sticker-img" alt="current avatar">
+                        <img id="current-hat" src="https://cdn-icons-png.flaticon.com/512/3233/3233800.png" class="w-12 h-12 absolute top-0 hidden sticker-img" alt="hat">
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold">مظهر الشخصية الحالي</h3>
+                        <p class="text-xs text-indigo-200">اختر الملصقات التي تم شراؤها لتطبيقها فوراً!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="store-items-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-2"></div>
+        </section>
+
+        <!-- 8️⃣ Teacher Dashboard -->
+        <section id="page-teacher-dashboard" class="page-section space-y-6 max-w-5xl mx-auto">
+            <div class="flex justify-between items-center border-b pb-4">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800">لوحة المعلم 👩‍🏫 - شُعبة الثالث (أ)</h2>
+                    <p class="text-slate-400 text-xs font-semibold">متابعة درجات الطلاب، التنبيهات وإرسال المكافآت التشجيعية</p>
+                </div>
+                <span class="bg-indigo-100 text-indigo-800 font-bold px-3 py-1 rounded-full text-xs">28 طالب مسجل</span>
+            </div>
+
+            <!-- Low Performance Alert Panel -->
+            <div class="bg-rose-50 border-2 border-rose-200 p-5 rounded-3xl space-y-3">
+                <div class="flex items-center gap-3 text-rose-800 font-black text-base">
+                    <i class="fa-solid fa-triangle-exclamation text-xl animate-pulse"></i>
+                    <span>تنبيه الطلاب المتراجعين (يحتاجون دعم ومتابعة) 🚨</span>
+                </div>
+                <p class="text-xs text-slate-600 font-semibold">الطلاب الذين يقل نسبة إنجازهم عن 50% في الدروس والاختبارات الأخيرة:</p>
+                
+                <div id="at-risk-students-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <!-- Dynamic Alert Cards -->
+                </div>
+            </div>
+
+            <!-- Full Students Roster & Rewards Panel -->
+            <div class="bg-white p-6 rounded-3xl border shadow-sm space-y-4">
+                <h3 class="font-extrabold text-lg text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-users text-indigo-600"></i> قائمة درجات الطلاب وإرسال المكافآت
+                </h3>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-sm">
+                        <thead class="bg-slate-100 text-slate-700 font-black text-xs">
+                            <tr>
+                                <th class="p-3 rounded-r-xl">الطالب</th>
+                                <th class="p-3">نسبة الإنجاز</th>
+                                <th class="p-3">النقاط ⭐</th>
+                                <th class="p-3">المستوى</th>
+                                <th class="p-3 rounded-l-xl text-center">إرسال وسام تشجيعي (+20 نقطة)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacher-student-table-body" class="divide-y text-xs font-bold">
+                            <!-- Dynamic Table Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 9️⃣ School Admin Dashboard -->
+        <section id="page-admin-dashboard" class="page-section space-y-6 max-w-5xl mx-auto">
+            <div class="flex justify-between items-center border-b pb-4">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800">لوحة تحكم إدارة المدرسة 🏫</h2>
+                    <p class="text-slate-400 text-xs font-semibold">مدرسة الأمل الابتدائية - العراق</p>
+                </div>
+                <button onclick="addNewStudentPrompt()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold px-4 py-2 rounded-2xl text-xs shadow-md">
+                    + إضافة طالب جديد
+                </button>
+            </div>
+
+            <!-- Key Statistics Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-3xl border shadow-sm text-center">
+                    <span class="text-3xl font-black text-indigo-600 block" id="stat-total-students">120</span>
+                    <span class="text-xs text-slate-400 font-bold">إجمالي الطلاب</span>
+                </div>
+                <div class="bg-white p-5 rounded-3xl border shadow-sm text-center">
+                    <span class="text-3xl font-black text-emerald-600 block">8</span>
+                    <span class="text-xs text-slate-400 font-bold">المعلمين الفاعلين</span>
+                </div>
+                <div class="bg-white p-5 rounded-3xl border shadow-sm text-center">
+                    <span class="text-3xl font-black text-amber-500 block">86%</span>
+                    <span class="text-xs text-slate-400 font-bold">متوسط التفاعل</span>
+                </div>
+                <div class="bg-white p-5 rounded-3xl border shadow-sm text-center">
+                    <span class="text-3xl font-black text-rose-500 block" id="stat-at-risk-count">3</span>
+                    <span class="text-xs text-slate-400 font-bold">طلاب متراجعين 🚨</span>
+                </div>
+            </div>
+
+            <!-- School Admin Roster Overview -->
+            <div class="bg-white p-6 rounded-3xl border shadow-sm space-y-4">
+                <h3 class="font-extrabold text-lg text-slate-800">السجل العام للشُعب الدراسية</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-sm">
+                        <thead class="bg-slate-100 text-slate-700 font-black text-xs">
+                            <tr>
+                                <th class="p-3">الشُعبة</th>
+                                <th class="p-3">المعلم المسؤول</th>
+                                <th class="p-3">عدد الطلاب</th>
+                                <th class="p-3">نسبة الالتزام</th>
+                                <th class="p-3 text-center">الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y text-xs font-bold">
+                            <tr>
+                                <td class="p-3">الثالث (أ)</td>
+                                <td class="p-3">أ. زينب أحمد</td>
+                                <td class="p-3">28 طالب</td>
+                                <td class="p-3 text-emerald-600">89%</td>
+                                <td class="p-3 text-center"><span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full">ممتاز</span></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">الثالث (ب)</td>
+                                <td class="p-3">أ. علي جاسم</td>
+                                <td class="p-3">30 طالب</td>
+                                <td class="p-3 text-amber-600">74%</td>
+                                <td class="p-3 text-center"><span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full">جيد جداً</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 🔟 Daily Challenge Page -->
+        <section id="page-challenge" class="page-section space-y-6 max-w-xl mx-auto py-4">
+            <div class="flex items-center gap-3 border-b pb-3">
+                <button onclick="navigateTo('dashboard')" class="back-btn-kid bg-amber-400 hover:bg-amber-500 text-amber-950 font-black">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800">التحدي اليومي السريع 🔥</h2>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 sm:p-8 rounded-3xl border shadow-xl space-y-6">
+                <p class="font-extrabold text-slate-800 text-center text-lg">
+                    الرياضيات 🧮: ما هو الناتج الصحيح للجمع الآتي: <br>
+                    <span class="text-2xl text-indigo-600 dir-ltr inline-block my-2 font-mono">4000 + 500 = ؟</span>
+                </p>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="completeChallenge(true)" class="p-4 border-2 border-slate-200 rounded-2xl font-black text-indigo-700 hover:border-indigo-600 hover:bg-indigo-50 transition text-lg">
+                        4500
+                    </button>
+                    <button onclick="completeChallenge(false)" class="p-4 border-2 border-slate-200 rounded-2xl font-black text-indigo-700 hover:border-indigo-600 hover:bg-indigo-50 transition text-lg">
+                        4050
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12 py-6 text-center text-xs text-slate-400">
+        <div class="max-w-7xl mx-auto px-4 space-y-2">
+            <p>© 2026 Smart Class Iraq. جميع الحقوق محفوظة للمدارس والمنظومة التعليمية.</p>
+        </div>
+    </footer>
+
+    <!-- JS Application Engine -->
+    <script>
+        // Data Store (Persistent in LocalStorage)
+        let studentsData = JSON.parse(localStorage.getItem('smart_class_students')) || [
+            { id: 1, name: "سارة العبيدي", progress: 68, points: 350, level: 4, gender: "girl" },
+            { id: 2, name: "أحمد علي", progress: 35, points: 120, level: 2, gender: "boy" }, // At risk!
+            { id: 3, name: "مصطفى حسن", progress: 92, points: 580, level: 6, gender: "boy" },
+            { id: 4, name: "زينب محمد", progress: 42, points: 180, level: 2, gender: "girl" }  // At risk!
+        ];
+
+        let userPoints = parseInt(localStorage.getItem('smart_class_user_points')) || 350;
+        let userLevel = parseInt(localStorage.getItem('smart_class_user_level')) || 4;
+        let currentGender = localStorage.getItem('smart_class_gender') || 'girl';
+        let currentLang = localStorage.getItem('smart_class_lang') || 'ar';
+        let currentUserRole = null;
+        let answeredQuestionsSet = new Set(JSON.parse(localStorage.getItem('smart_class_answered') || "[]"));
+
+        const genderData = {
+            girl: {
+                avatar: "https://cdn-icons-png.flaticon.com/512/4140/4140047.png",
+                sticker: "https://cdn-icons-png.flaticon.com/512/744/744922.png",
+                items: [
+                    { name: "تاج الأميرات الذهبي", cost: 100, type: "hat", icon: "https://cdn-icons-png.flaticon.com/512/3233/3233800.png" },
+                    { name: "طوق الفراشة البرّاق", cost: 120, type: "hat", icon: "https://cdn-icons-png.flaticon.com/512/2926/2926768.png" },
+                    { name: "نظارات العبقري الوردية", cost: 150, type: "hat", icon: "https://cdn-icons-png.flaticon.com/512/1785/1785316.png" }
+                ]
+            },
+            boy: {
+                avatar: "https://cdn-icons-png.flaticon.com/512/4140/4140048.png",
+                sticker: "https://cdn-icons-png.flaticon.com/512/1356/1356479.png",
+                items: [
+                    { name: "خوذة البطل الخارق", cost: 100, type: "hat", icon: "https://cdn-icons-png.flaticon.com/512/3593/3593452.png" },
+                    { name: "قبعة الساحر الذكي", cost: 120, type: "hat", icon: "https://cdn-icons-png.flaticon.com/512/2413/2413066.png" },
+                    { name: "حقيبة الصاروخ الناري", cost: 150, type: "hat", icon: "https://cdn-icons-png.flaticon.com/512/1356/1356479.png" }
+                ]
+            }
+        };
+
+        const curriculumData = {
+            english: {
+                title: "📘 English for Iraq – Grade 3",
+                units: [
+                    {
+                        id: 1,
+                        name: "Unit 1: My Friends & Family",
+                        lessons: [
+                            {
+                                id: "e1_l1",
+                                title: "Lesson 1: Greetings & Hello",
+                                explanation: `
+                                    <h3 class="text-2xl font-black text-indigo-900 mb-3">Hello & Goodbye 👋</h3>
+                                    <p class="text-slate-700 text-lg leading-relaxed mb-4">في هذا الدرس الجميل نتعلم كيف نلقي التحية على أصدقائنا في المدرسة باللغة الإنجليزية:</p>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div class="p-4 bg-blue-50 rounded-2xl border-2 border-blue-200 flex items-center justify-between">
+                                            <div>
+                                                <span class="font-black text-blue-800 text-xl block">Hello!</span>
+                                                <span class="text-sm text-slate-600 font-bold">مرحباً</span>
+                                            </div>
+                                            <button onclick="speak('Hello')" class="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-lg shadow-md"><i class="fa-solid fa-volume-high"></i></button>
+                                        </div>
+                                        <div class="p-4 bg-blue-50 rounded-2xl border-2 border-blue-200 flex items-center justify-between">
+                                            <div>
+                                                <span class="font-black text-blue-800 text-xl block">Goodbye!</span>
+                                                <span class="text-sm text-slate-600 font-bold">مع السلامة</span>
+                                            </div>
+                                            <button onclick="speak('Goodbye')" class="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-lg shadow-md"><i class="fa-solid fa-volume-high"></i></button>
+                                        </div>
+                                    </div>
+                                `,
+                                quizzes: [
+                                    { id: "e1_q1", question: "1️⃣ عندما تلتقي بصديقك في الصباح، ماذا تقول له؟", options: ["Goodbye", "Good morning", "Good night"], correctIndex: 1 },
+                                    { id: "e1_q2", question: "2️⃣ ما معنى كلمة 'Hello' باللغة العربية؟", options: ["شكراً", "مرحباً", "مع السلامة"], correctIndex: 1 }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            math: {
+                title: "📕 الرياضيات – الصف الثالث الابتدائي",
+                units: [
+                    {
+                        id: 1,
+                        name: "الفصل الأول: الأعداد حتى 9999 والقيمة المكانية",
+                        lessons: [
+                            {
+                                id: "m1_l1",
+                                title: "الدرس 1: مرتبة الألوف والقيمة المكانية",
+                                explanation: `
+                                    <h3 class="text-2xl font-black text-rose-900 mb-3">القيمة المكانية للأعداد 🧮</h3>
+                                    <p class="text-slate-700 text-lg leading-relaxed mb-4">العدد المكون من أربعة أرقام يتكون من: آحاد، عشرات، مئات، وألوف.</p>
+                                    <div class="p-5 bg-rose-50 rounded-2xl border-2 border-rose-200 text-lg">
+                                        <p class="font-black text-rose-900 mb-2">مثال: العدد (4523)</p>
+                                        <ul class="list-disc list-inside space-y-1 text-base font-bold text-slate-700">
+                                            <li>3 = آحاد</li>
+                                            <li>2 = عشرات (20)</li>
+                                            <li>5 = مئات (500)</li>
+                                            <li>4 = ألوف (4000)</li>
+                                        </ul>
+                                    </div>
+                                `,
+                                quizzes: [
+                                    { id: "m1_q1", question: "1️⃣ ما القيمة المكانية للرقم (6) في العدد (6520)؟", options: ["60", "600", "6000"], correctIndex: 2 },
+                                    { id: "m1_q2", question: "2️⃣ كم عدد الألوف في العدد (8000)؟", options: ["8 ألوف", "80 ألف", "8 مئات"], correctIndex: 0 }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            science: {
+                title: "🔬 العلوم – الصف الثالث الابتدائي",
+                units: [
+                    {
+                        id: 1,
+                        name: "الفصل الأول: تغذية الأحياء",
+                        lessons: [
+                            {
+                                id: "s1_l1",
+                                title: "الدرس 1: كيف تصنع النباتات غذاءها؟",
+                                explanation: `<h3 class="text-2xl font-black text-emerald-900 mb-3">صنع الغذاء عند النباتات 🌱</h3><p class="text-slate-700 text-lg leading-relaxed mb-4">النباتات تصنع غذاءها بنفسها بعملية تسمى (البناء الضوئي) بوجود الضوء والماء والهواء.</p>`,
+                                quizzes: [
+                                    { id: "s1_q1", question: "1️⃣ هل تصنع النباتات غذاءها بنفسها؟", options: ["نعم (صح)", "لا (خطأ)"], correctIndex: 0 }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            arabic: {
+                title: "📗 القراءة العربية – الصف الثالث الابتدائي",
+                units: [
+                    {
+                        id: 1,
+                        name: "الفصل الأول: القراءة والمحفوظات",
+                        lessons: [
+                            {
+                                id: "a1_l1",
+                                title: "الدرس 1: التاء المربوطة والمفتوحة",
+                                explanation: `<h3 class="text-2xl font-black text-amber-900 mb-3">التاء المربوطة والمفتوحة ✍️</h3><p class="text-slate-700 text-lg leading-relaxed mb-4">التاء المربوطة (ـة) تلفظ هاءً عند الوقف مثل (مدرسة)، والتاء المفتوحة (ت) تلفظ تاءً دائماً مثل (بنت).</p>`,
+                                quizzes: [
+                                    { id: "a1_q1", question: "1️⃣ اختر الكلمة المكتوبة بشكل صحيح:", options: ["مدرسة", "مدرست", "مدرسهـ"], correctIndex: 0 }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            islamic: {
+                title: "📙 التربية الإسلامية – الصف الثالث الابتدائي",
+                units: [
+                    {
+                        id: 1,
+                        name: "الوحدة الأولى: القرآن الكريم",
+                        lessons: [
+                            {
+                                id: "i1_l1",
+                                title: "الدرس 1: سورة الفاتحة المباركة",
+                                explanation: `<h3 class="text-2xl font-black text-teal-900 mb-3">سورة الفاتحة 📖</h3><p class="text-slate-700 text-lg leading-relaxed mb-4">سورة الفاتحة هي أم الكتاب ونقرأها في كل ركعة من صلاتنا.</p>`,
+                                quizzes: [
+                                    { id: "i1_q1", question: "1️⃣ كم مرة نقرأ سورة الفاتحة في الصلاة؟", options: ["في كل ركعة", "مرة واحدة فقط باليوم"], correctIndex: 0 }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // Navigation Router Engine
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+            const target = document.getElementById(`page-${pageId}`);
+            if (target) {
+                target.classList.add('active');
+            }
+            window.scrollTo(0, 0);
+
+            if (pageId === 'store') renderStoreItems();
+            if (pageId === 'teacher-dashboard') renderTeacherDashboard();
+            if (pageId === 'admin-dashboard') renderAdminDashboard();
+        }
+
+        // Gender Selector
+        function setGender(gender) {
+            currentGender = gender;
+            localStorage.setItem('smart_class_gender', gender);
+
+            const current = genderData[gender];
+            document.getElementById('user-avatar-display').src = current.avatar;
+            document.getElementById('current-avatar').src = current.avatar;
+            document.getElementById('dash-gender-sticker').src = current.sticker;
+            document.getElementById('login-avatar-preview').src = current.avatar;
+
+            renderStoreItems();
+        }
+
+        // Student Login
+        function handleStudentLogin(e) {
+            e.preventDefault();
+            currentUserRole = 'student';
+            const name = document.getElementById('student-name-input').value;
+            document.getElementById('welcome-name').innerText = name;
+
+            document.getElementById('student-top-bar').classList.remove('hidden');
+            document.getElementById('student-top-bar').classList.add('flex');
+            document.getElementById('staff-top-bar').classList.add('hidden');
+
+            navigateTo('dashboard');
+        }
+
+        // Teacher & Admin Staff Login
+        function handleStaffLogin(e, role) {
+            e.preventDefault();
+            currentUserRole = role;
+
+            document.getElementById('student-top-bar').classList.add('hidden');
+            document.getElementById('staff-top-bar').classList.remove('hidden');
+            document.getElementById('staff-top-bar').classList.add('flex');
+
+            if (role === 'teacher') {
+                document.getElementById('staff-role-badge').innerText = 'أستاذ المادة 👩‍🏫';
+                navigateTo('teacher-dashboard');
+            } else {
+                document.getElementById('staff-role-badge').innerText = 'إدارة المدرسة 🏫';
+                navigateTo('admin-dashboard');
+            }
+        }
+
+        // Logout Engine
+        function logout() {
+            currentUserRole = null;
+            document.getElementById('student-top-bar').classList.add('hidden');
+            document.getElementById('staff-top-bar').classList.add('hidden');
+            navigateTo('landing');
+        }
+
+        // Open Subject Logic
+        function openSubject(subjectKey) {
+            const activeSubject = curriculumData[subjectKey];
+            document.getElementById('subject-title').innerText = activeSubject.title;
+
+            const unitsContainer = document.getElementById('units-container');
+            unitsContainer.innerHTML = '';
+
+            activeSubject.units.forEach((unit, idx) => {
+                const unitHtml = `
+                    <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex items-center justify-between border-b pb-3">
+                            <div class="flex items-center gap-3">
+                                <span class="w-10 h-10 bg-indigo-100 text-indigo-700 rounded-2xl flex items-center justify-center font-black text-sm">0${idx+1}</span>
+                                <h4 class="font-extrabold text-slate-800 text-base">${unit.name}</h4>
+                            </div>
+                            <span class="text-xs bg-emerald-100 text-emerald-800 font-extrabold px-3 py-1 rounded-full">مفتوح 🔓</span>
+                        </div>
+                        <div class="space-y-2 pt-1">
+                            ${unit.lessons.map(l => `
+                                <div class="flex justify-between items-center bg-slate-50 p-3.5 rounded-2xl hover:bg-indigo-50 transition border border-slate-100">
+                                    <span class="text-sm font-bold text-slate-800">${l.title}</span>
+                                    <button onclick="startLesson('${subjectKey}', ${unit.id}, '${l.id}')" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl text-xs shadow-sm">
+                                        دخول الدرس 📖
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                unitsContainer.innerHTML += unitHtml;
+            });
+
+            navigateTo('units');
+        }
+
+        // Start Lesson Detail
+        function startLesson(subjectKey, unitId, lessonId) {
+            const subject = curriculumData[subjectKey];
+            const unit = subject.units.find(u => u.id === unitId);
+            const lesson = unit.lessons.find(l => l.id === lessonId);
+
+            document.getElementById('lesson-content-card').innerHTML = lesson.explanation;
+
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.innerHTML = '';
+
+            lesson.quizzes.forEach((q) => {
+                const isAnswered = answeredQuestionsSet.has(q.id);
+                quizContainer.innerHTML += `
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3" id="quiz-block-${q.id}">
+                        <p class="font-extrabold text-slate-800 text-base">${q.question}</p>
+                        <div class="space-y-2">
+                            ${q.options.map((opt, i) => `
+                                <button ${isAnswered ? 'disabled' : ''} onclick="checkQuizAnswer(this, '${q.id}',${i === q.correctIndex})" class="quiz-opt-btn w-full p-3.5 border border-slate-200 bg-white rounded-2xl text-right font-bold text-sm hover:bg-indigo-50 transition flex justify-between items-center disabled:opacity-70">
+                                    <span>${opt}</span>
+                                    <i class="fa-regular fa-circle text-slate-300"></i>
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div id="feedback-${q.id}" class="hidden p-3 rounded-xl font-bold text-center text-xs"></div>
+                    </div>
+                `;
+            });
+
+            navigateTo('lesson');
+        }
+
+        // Quiz Answer Checking
+        function checkQuizAnswer(btn, quizId, isCorrect) {
+            const parentBlock = document.getElementById(`quiz-block-${quizId}`);
+            const feedback = document.getElementById(`feedback-${quizId}`);
+            const allBtns = parentBlock.querySelectorAll('.quiz-opt-btn');
+
+            allBtns.forEach(b => b.disabled = true);
+            feedback.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+
+            if (isCorrect) {
+                feedback.classList.add('bg-emerald-100', 'text-emerald-800');
+                feedback.innerHTML = '🎉 إجابة صحيحة وممتازة! أحسنت يا بطل +10 نقاط ⭐';
+                btn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-600');
+
+                if (!answeredQuestionsSet.has(quizId)) {
+                    answeredQuestionsSet.add(quizId);
+                    localStorage.setItem('smart_class_answered', JSON.stringify([...answeredQuestionsSet]));
+                    addPoints(10);
+                }
+            } else {
+                feedback.classList.add('bg-rose-100', 'text-rose-800');
+                feedback.innerHTML = '❌ إجابة خاطئة!';
+                btn.classList.add('bg-rose-100', 'border-rose-300');
+            }
+        }
+
+        // Points Engine
+        function addPoints(pts) {
+            userPoints += pts;
+            localStorage.setItem('smart_class_user_points', userPoints);
+
+            document.getElementById('user-points').innerText = userPoints;
+            document.getElementById('dash-points').innerText = userPoints;
+            document.getElementById('store-points-val').innerText = userPoints;
+        }
+
+        // Rewards Store Rendering
+        function renderStoreItems() {
+            const storeGrid = document.getElementById('store-items-grid');
+            if (!storeGrid) return;
+            storeGrid.innerHTML = '';
+
+            const items = genderData[currentGender].items;
+            items.forEach(item => {
+                storeGrid.innerHTML += `
+                    <div class="bg-white p-5 rounded-3xl border shadow-sm flex flex-col items-center text-center space-y-3">
+                        <img src="${item.icon}" class="w-16 h-16 p-2 bg-slate-50 rounded-2xl sticker-img" alt="${item.name}">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-lg">${item.name}</h4>
+                            <p class="text-xs text-slate-400">خاصة بالأبطال والمتفوقين</p>
+                        </div>
+                        <button onclick="buyItem(${item.cost}, '${item.type}', '${item.icon}')" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition shadow-sm">
+                            شراء بـ ${item.cost} ⭐
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        // Store Purchase
+        function buyItem(cost, type, iconUrl) {
+            if (userPoints >= cost) {
+                userPoints -= cost;
+                addPoints(0);
+                const hatEl = document.getElementById('current-hat');
+                hatEl.src = iconUrl;
+                hatEl.classList.remove('hidden');
+                alert(`مبروك! تم شراء الملصق وتطبيقه على شخصيتك بنجاح!`);
+            } else {
+                alert("نقاطك غير كافية! أكمل المزيد من الدروس والتحديات للحصول على نقاط أكثر.");
+            }
+        }
+
+        // Teacher Dashboard Generator (Roster & Alert Cards)
+        function renderTeacherDashboard() {
+            const riskContainer = document.getElementById('at-risk-students-list');
+            const tableBody = document.getElementById('teacher-student-table-body');
+
+            riskContainer.innerHTML = '';
+            tableBody.innerHTML = '';
+
+            studentsData.forEach(st => {
+                // At-Risk Alert (< 50% Progress)
+                if (st.progress < 50) {
+                    riskContainer.innerHTML += `
+                        <div class="bg-white p-3.5 rounded-2xl border border-rose-200 flex justify-between items-center shadow-sm">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-8 h-8 rounded-full bg-rose-100 text-rose-700 font-black flex items-center justify-center text-xs">⚠️</span>
+                                <div>
+                                    <span class="font-bold text-slate-800 text-xs block">${st.name}</span>
+                                    <span class="text-[10px] text-rose-600 font-semibold">التقدم: ${st.progress}% فقط!</span>
+                                </div>
+                            </div>
+                            <button onclick="awardStudentPoints(${st.id})" class="px-3 py-1 bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold rounded-xl text-[11px] shadow-sm">
+                                إرسال تشجيع ⭐
+                            </button>
+                        </div>
+                    `;
+                }
+
+                // Student Table Row
+                tableBody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 flex items-center gap-2">
+                            <span>${st.gender === 'girl' ? '👧' : '👦'}</span>
+                            <span class="font-bold text-slate-800">${st.name}</span>
+                        </td>
+                        <td class="p-3">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs ${st.progress < 50 ? 'text-rose-600 font-extrabold' : 'text-slate-600'}">${st.progress}%</span>
+                                <div class="w-16 bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                    <div class="h-full ${st.progress < 50 ? 'bg-rose-500' : 'bg-emerald-500'}" style="width: ${st.progress}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-3 text-amber-600 font-black">${st.points} ⭐</td>
+                        <td class="p-3 text-indigo-700 font-extrabold">مستوى ${st.level}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="awardStudentPoints(${st.id})" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold rounded-xl text-xs">
+                                +20 نقطة تشجيع 🏅
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Admin Dashboard Engine
+        function renderAdminDashboard() {
+            document.getElementById('stat-total-students').innerText = studentsData.length * 30; // Simulated
+            const atRisk = studentsData.filter(s => s.progress < 50).length;
+            document.getElementById('stat-at-risk-count').innerText = atRisk;
+        }
+
+        // Award Bonus Points to Student
+        function awardStudentPoints(studentId) {
+            const st = studentsData.find(s => s.id === studentId);
+            if (st) {
+                st.points += 20;
+                localStorage.setItem('smart_class_students', JSON.stringify(studentsData));
+                alert(`تم إرسال وسام تشجيعي (+20 نقطة) للطالب ${st.name} بنجاح!`);
+                renderTeacherDashboard();
+            }
+        }
+
+        // Add Student Prompt (Admin Action)
+        function addNewStudentPrompt() {
+            const name = prompt("أدخل اسم الطالب الجديد:");
+            if (name) {
+                const newSt = { id: Date.now(), name: name, progress: 100, points: 50, level: 1, gender: "boy" };
+                studentsData.push(newSt);
+                localStorage.setItem('smart_class_students', JSON.stringify(studentsData));
+                alert(`تم إضافة الطالب ${name} إلى سجل السحابة بنجاح!`);
+                renderAdminDashboard();
+            }
+        }
+
+        // Challenge Complete
+        function completeChallenge(isCorrect) {
+            if (isCorrect) {
+                if (!answeredQuestionsSet.has('daily_challenge')) {
+                    answeredQuestionsSet.add('daily_challenge');
+                    localStorage.setItem('smart_class_answered', JSON.stringify([...answeredQuestionsSet]));
+                    addPoints(50);
+                    alert("🎉 مبروك! إجابة صحيحة وحصلت على +50 نقطة إضافية!");
+                } else {
+                    alert("لقد أتممت هذا التحدي مسبقاً اليوم!");
+                }
+                navigateTo('dashboard');
+            } else {
+                alert("إجابة خاطئة! حاول مرة أخرى.");
+            }
+        }
+
+        // Language Switcher (Ar <-> En)
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            localStorage.setItem('smart_class_lang', currentLang);
+
+            const root = document.getElementById('html-root');
+            const langBtn = document.getElementById('lang-btn-text');
+
+            if (currentLang === 'en') {
+                root.setAttribute('dir', 'ltr');
+                root.setAttribute('lang', 'en');
+                langBtn.innerText = 'العربية';
+
+                document.getElementById('lang-sub-title').innerText = 'Interactive Learning Platform • Iraqi Curriculum';
+                document.getElementById('landing-badge').innerText = '✨ Official Smart Learning Platform for Iraq Primary Schools';
+                document.getElementById('landing-title').innerText = 'Make Learning a Fun Journey for Future Heroes 🚀';
+                document.getElementById('btn-role-student').innerText = 'Student Login';
+                document.getElementById('btn-role-teacher').innerText = 'Teacher Login';
+                document.getElementById('btn-role-admin').innerText = 'School Admin Login';
+            } else {
+                root.setAttribute('dir', 'rtl');
+                root.setAttribute('lang', 'ar');
+                langBtn.innerText = 'English';
+
+                document.getElementById('lang-sub-title').innerText = 'منصة التعليم التفاعلي • المنهج العراقي';
+                document.getElementById('landing-badge').innerText = '✨ المنصة التعليمية التفاعلية المعتمدة للمدارس الابتدائية';
+                document.getElementById('landing-title').innerText = 'حول التعلم إلى رحلة ممتعة وتفاعلية لأبطال المستقبل 🚀';
+                document.getElementById('btn-role-student').innerText = 'دخول الطالب';
+                document.getElementById('btn-role-teacher').innerText = 'دخول المعلم';
+                document.getElementById('btn-role-admin').innerText = 'دخول إدارة المدرسة';
+            }
+        }
+
+        // Speech Synthesis Engine
+        function speak(text) {
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'en-US';
+            window.speechSynthesis.speak(msg);
+        }
+
+        // 🎨 Interactive Whiteboard Canvas
+        let canvas, ctx, drawing = false, penColor = '#2563eb';
+
+        function openWhiteboard() {
+            navigateTo('whiteboard');
+            setTimeout(initCanvas, 150);
+        }
+
+        function initCanvas() {
+            canvas = document.getElementById('paint-canvas');
+            if(!canvas) return;
+            ctx = canvas.getContext('2d');
+            
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth - 24;
+            canvas.height = 380;
+
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = penColor;
+
+            canvas.onmousedown = startDrawing;
+            canvas.onmouseup = stopDrawing;
+            canvas.onmousemove = draw;
+
+            canvas.addEventListener('touchstart', (e) => { startDrawing(e.touches[0]); e.preventDefault(); }, false);
+            canvas.addEventListener('touchend', (e) => { stopDrawing(); e.preventDefault(); }, false);
+            canvas.addEventListener('touchmove', (e) => { draw(e.touches[0]); e.preventDefault(); }, false);
+        }
+
+        function startDrawing(e) { drawing = true; draw(e); }
+        function stopDrawing() { drawing = false; if (ctx) ctx.beginPath(); }
+
+        function draw(e) {
+            if (!drawing || !ctx) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            ctx.strokeStyle = penColor;
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        function setPenColor(color) { penColor = color; }
+        function clearCanvas() { if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+        // Application OnLoad Initializer
+        window.onload = function() {
+            setGender(currentGender);
+            addPoints(0);
+        };
+    </script>
+</body>
+</html>
