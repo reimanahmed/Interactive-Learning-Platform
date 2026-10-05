@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart Class | المنصة التعليمية الذكية</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+body{font-family:Cairo,sans-serif;background:#f8fafc;color:#1e293b}
+canvas{touch-action:none}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:1.25rem;padding:1rem}
+.btn{background:#4f46e5;color:#fff;font-weight:700;border-radius:.75rem;padding:.5rem 1rem}
+.btn:hover{background:#4338ca}
+.inp{width:100%;border:1px solid #cbd5e1;border-radius:.75rem;padding:.7rem 1rem;font-weight:600;background:#fff}
+.opt{display:block;width:100%;text-align:start;border:1px solid #cbd5e1;background:#fff;border-radius:.75rem;padding:.7rem 1rem;font-weight:700;margin-top:.5rem}
+.opt:disabled{opacity:.75}
+</style>
+</head>
+<body>
+<script>window.onerror=function(m,u,l,c){var d=document.createElement('pre');d.style.cssText='background:#fee2e2;color:#991b1b;padding:12px;margin:12px;direction:ltr;white-space:pre-wrap;font:12px monospace';d.textContent='Error: '+m+' (line '+l+':'+c+')';document.body.insertBefore(d,document.body.firstChild)}</script>
+<noscript><p style="padding:16px;font-weight:700">JavaScript is disabled / فعّل الجافاسكربت</p></noscript>
+<header class="bg-white shadow-sm sticky top-0 z-10">
+  <div class="max-w-5xl mx-auto px-4 py-2 flex items-center justify-between gap-2">
+    <div class="font-black text-indigo-900 cursor-pointer" onclick="home0()">🎓 Smart Class</div>
+    <div class="flex items-center gap-3">
+      <div id="bar" class="flex items-center gap-3"></div>
+      <button id="lg" onclick="toggleLang()" class="text-xs font-bold bg-slate-100 rounded-lg px-2 py-1"></button>
+    </div>
+  </div>
+</header>
+<main id="app" class="max-w-5xl mx-auto p-4"></main>
+<div class="text-center text-xs text-slate-400 p-4">Smart Class demo v2</div>
+<div id="toast" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);opacity:0;transition:.3s;background:#1e293b;color:#fff;padding:.6rem 1.2rem;border-radius:999px;font-weight:700;z-index:50;pointer-events:none"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+const today=()=>new Date().toISOString().slice(0,10);
+
+/* ---------- Translations: key:[arabic, english] ---------- */
+const L={
+hero:['حوّل التعلم إلى رحلة ممتعة 🚀','Make learning a fun journey 🚀'],
+enter:['دخول','Sign in'],student:['طالب','Student'],teacher:['معلم','Teacher'],admin:['إدارة المدرسة','School admin'],
+user:['اسم المستخدم','Username'],pass:['كلمة المرور','Password'],bad:['بيانات الدخول غير صحيحة','Wrong credentials'],
+demo:['نسخة تجريبية ببيانات وهمية فقط. لا تُدخل بيانات حقيقية.','Demo with fake data only. Do not enter real data.'],
+out:['خروج','Log out'],lvl:['مستوى','Level'],hi:['أهلاً','Hi'],pts:['النقاط','Points'],prog:['التقدم','Progress'],
+daily:['التحدي اليومي (+50)','Daily challenge (+50)'],board:['السبورة','Whiteboard'],store:['المتجر','Store'],
+back:['رجوع','Back'],done:['تم الحل','Solved'],wrong:['حاول مرة أخرى','Try again'],
+chdone:['أنجزت تحدي اليوم، عد غداً!','Done for today, come back tomorrow!'],
+buy:['شراء','Buy'],wear:['ارتداء','Wear'],worn:['مُرتدى','Worn'],need:['نقاطك لا تكفي','Not enough points'],
+tdash:['لوحة المعلم','Teacher dashboard'],risk:['طلاب متراجعون (أقل من 50%)','Students falling behind (under 50%)'],
+norisk:['لا يوجد طلاب متراجعون 🎉','No students at risk 🎉'],adash:['لوحة الإدارة','Admin dashboard'],
+add:['إضافة طالب','Add student'],name:['الاسم','Name'],total:['الطلاب','Students'],avg:['متوسط التقدم','Avg progress'],
+classes:['الشُعب','Classes'],reset:['إعادة بيانات التجربة','Reset demo data'],clear:['مسح','Clear'],
+quiz:['اختبر نفسك (+10 نقاط)','Quick quiz (+10 points)'],cls:['الشعبة','Class'],boy:['ولد','Boy'],girl:['بنت','Girl'],
+award:['وسام +20','+20 award'],sent:['تم إرسال الوسام','Award sent'],added:['تمت الإضافة','Student added'],
+school:['مدرسة الأمل الابتدائية','Al-Amal Primary School'],lvlup:['ارتفع مستواك!','Level up!'],
+subj:['المواد الدراسية','Subjects'],picked:['اختر اسمك','Pick your name']
+};
+let lang='ar';try{lang=localStorage.getItem('sc_lang')||'ar'}catch(e){}
+const t=k=>L[k]?L[k][lang==='ar'?0:1]:k;
+
+/* ---------- Curriculum (demo content) ---------- */
+const C={
+english:{ic:'📘',ar:'اللغة الإنجليزية',en:'English',title:'Hello & Goodbye 👋',
+ text:'Hello = مرحباً · Goodbye = مع السلامة · Good morning = صباح الخير',say:['Hello','Goodbye','Good morning'],
+ q:[['What do you say in the morning?',['Goodbye','Good morning','Good night'],1],['ما معنى Hello؟',['شكراً','مرحباً','مع السلامة'],1]]},
+math:{ic:'🧮',ar:'الرياضيات',en:'Math',title:'القيمة المكانية',
+ text:'العدد 4523 = 4 ألوف + 5 مئات + 2 عشرات + 3 آحاد.',
+ q:[['ما القيمة المكانية للرقم 6 في العدد 6520؟',['60','600','6000'],2],['4000 + 500 = ؟',['4500','4050','5000'],0]]},
+science:{ic:'🔬',ar:'العلوم',en:'Science',title:'كيف تصنع النباتات غذاءها؟',
+ text:'تصنع النباتات غذاءها بنفسها بعملية البناء الضوئي، وتحتاج إلى الضوء والماء والهواء.',
+ q:[['هل تصنع النباتات غذاءها بنفسها؟',['نعم','لا'],0],['ماذا تحتاج النباتات للبناء الضوئي؟',['ضوء وماء وهواء','حجارة فقط','ظلام'],0]]},
+arabic:{ic:'📗',ar:'القراءة العربية',en:'Arabic',title:'التاء المربوطة والمفتوحة',
+ text:'التاء المربوطة (ة) مثل: مدرسة. والتاء المفتوحة (ت) مثل: بنت.',
+ q:[['اختر الكلمة المكتوبة صحيحاً:',['مدرسة','مدرست'],0],['أي كلمة فيها تاء مفتوحة؟',['بنت','مدرسة'],0]]},
+islamic:{ic:'🕌',ar:'التربية الإسلامية',en:'Islamic studies',title:'سورة الفاتحة',
+ text:'سورة الفاتحة هي أم الكتاب، ونقرأها في كل ركعة من صلاتنا.',
+ q:[['كم مرة نقرأ الفاتحة في الصلاة؟',['في كل ركعة','مرة واحدة باليوم'],0],['أي سورة تسمى أم الكتاب؟',['الفاتحة','الإخلاص'],0]]}
+};
+const TOTAL=Object.values(C).reduce((a,c)=>a+c.q.length,0);
+const ITEMS={
+girl:[{e:'👑',c:100,ar:'تاج ذهبي',en:'Golden crown'},{e:'🎀',c:60,ar:'فيونكة',en:'Bow'},{e:'🌸',c:80,ar:'زهرة',en:'Flower'}],
+boy:[{e:'🧢',c:60,ar:'قبعة رياضية',en:'Cap'},{e:'🎩',c:100,ar:'قبعة الساحر',en:'Magic hat'},{e:'🚀',c:80,ar:'صاروخ',en:'Rocket'}]};
+
+/* ---------- Data layer ----------
+   DEMO ONLY: data is kept in this browser's localStorage.
+   To go live, replace DB.load/DB.save with calls to a real backend API
+   (with server-side login, hashed passwords and HTTPS). Never keep real
+   students' data or passwords in GitHub or in this file. */
+const st=(id,name,g,cls,pts,done)=>({id,name,gender:g,cls,pin:'1234',points:pts,done,own:[],eq:'',ch:''});
+const DB={key:'sc_demo_v1',
+ seed(){return{students:[
+  st('s1','سارة العبيدي','girl','3A',350,['english0','english1','math0','math1','science0','science1','arabic0']),
+  st('s2','أحمد علي','boy','3A',120,['english0','math0','islamic0']),
+  st('s3','مصطفى حسن','boy','3B',580,['english0','english1','math0','math1','science0','science1','arabic0','arabic1','islamic0']),
+  st('s4','زينب محمد','girl','3B',180,['english0','english1','arabic0','islamic0'])],
+  staff:[{id:'t1',role:'teacher',user:'teacher',pass:'demo'},{id:'a1',role:'admin',user:'admin',pass:'demo'}]}},
+ load(){try{const d=JSON.parse(localStorage.getItem(this.key));if(d&&d.students&&d.staff)return d}catch(e){}return this.seed()},
+ save(d){try{localStorage.setItem(this.key,JSON.stringify(d))}catch(e){}}};
+
+/* ---------- State ---------- */
+let D=DB.load(),sess=null,V='login',A=null,tabRole='student',pen='#2563eb',ctx=null;
+try{sess=JSON.parse(sessionStorage.getItem('sc_s'))}catch(e){}
+if(sess)V=sess.role==='student'?'home':sess.role;
+const save=()=>DB.save(D);
+const me=()=>sess&&sess.role==='student'?D.students.find(s=>s.id===sess.id):null;
+const lvl=p=>Math.floor(p/100)+1;
+const pr=s=>Math.round(s.done.length/TOTAL*100);
+const av=s=>(s.eq||'')+(s.gender==='girl'?'👧':'👦');
+const need={home:'student',lesson:'student',store:'student',board:'student',challenge:'student',teacher:'teacher',admin:'admin'};
+
+function go(v,a){if(need[v]&&(!sess||sess.role!==need[v]))v='login';V=v;A=a;render();scrollTo(0,0)}
+function home0(){go(!sess?'login':sess.role==='student'?'home':sess.role)}
+function toast(m){const e=$('toast');e.textContent=m;e.style.opacity=1;clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.opacity=0,1800)}
+function setTab(r){tabRole=r;render()}
+function toggleLang(){lang=lang==='ar'?'en':'ar';try{localStorage.setItem('sc_lang',lang)}catch(e){}render()}
+const back=()=>`<button onclick="home0()" class="btn mb-2 text-sm">${lang==='ar'?'→':'←'} ${t('back')}</button>`;
+
+function bar(){const s=me();
+ $('bar').innerHTML=sess?(s?`<span class="font-black text-amber-700 text-xs">⭐ ${s.points} · ${t('lvl')} ${lvl(s.points)}</span>`:`<span class="text-xs font-bold">${t(sess.role)}</span>`)+`<button onclick="logout()" class="text-rose-600 text-xs font-bold">${t('out')}</button>`:''}
+function addPts(s,n){const a=lvl(s.points);s.points+=n;save();bar();if(lvl(s.points)>a)setTimeout(()=>toast('🏆 '+t('lvlup')),1900)}
+
+/* ---------- Views ---------- */
+const VIEWS={
+login(){
+ const tabs=['student','teacher','admin'].map(r=>`<button onclick="setTab('${r}')" class="flex-1 py-2 rounded-xl font-bold text-sm ${tabRole===r?'bg-indigo-600 text-white':'bg-slate-100'}">${t(r)}</button>`).join('');
+ const f=tabRole==='student'
+  ?`<select id="u" class="inp">${D.students.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('')}</select><input id="p" type="password" class="inp" placeholder="PIN">`
+  :`<input id="u" class="inp" placeholder="${t('user')}" autocomplete="off"><input id="p" type="password" class="inp" placeholder="${t('pass')}">`;
+ return `<div class="max-w-md mx-auto space-y-4"><div class="text-center space-y-1"><div class="text-6xl">🎓</div><h2 class="text-2xl font-black">${t('hero')}</h2><p class="text-xs text-slate-500 font-bold">${t('school')}</p></div>
+ <div class="card space-y-3"><div class="flex gap-2">${tabs}</div>${f}<div id="err" class="text-rose-600 text-xs font-bold"></div><button onclick="doLogin()" class="btn w-full py-3">${t('enter')}</button></div>
+ <div class="card bg-amber-50 border-amber-200 text-xs font-bold leading-loose">🧪 ${t('demo')}<br>${t('student')}: PIN <b>1234</b> · ${t('teacher')}: <b>teacher / demo</b> · ${t('admin')}: <b>admin / demo</b></div></div>`},
+
+home(){const s=me();
+ const subs=Object.entries(C).map(([k,c])=>{const d=c.q.filter((_,j)=>s.done.includes(k+j)).length,p=Math.round(d/c.q.length*100);
+  return `<div onclick="go('lesson','${k}')" class="card cursor-pointer hover:shadow-md space-y-2"><div class="text-4xl">${c.ic}</div><b>${c[lang]}</b><div class="bg-slate-100 h-2 rounded-full"><div class="bg-indigo-500 h-2 rounded-full" style="width:${p}%"></div></div><span class="text-xs text-slate-500">${p}%</span></div>`}).join('');
+ const acts=[['challenge','🔥',t('daily')],['board','🎨',t('board')],['store','🛍️',t('store')]].map(a=>`<button onclick="go('${a[0]}')" class="card text-center font-bold text-sm hover:shadow-md"><div class="text-3xl">${a[1]}</div>${a[2]}</button>`).join('');
+ const stat=(l,v,c)=>`<div class="card text-center"><div class="text-xs text-slate-500">${l}</div><b class="text-xl ${c}">${v}</b></div>`;
+ return `<div class="space-y-4"><div class="rounded-3xl bg-gradient-to-l from-indigo-700 to-purple-700 text-white p-5 flex items-center justify-between"><div><div class="text-xs opacity-80">${t('school')} · ${esc(s.cls)}</div><h2 class="text-2xl font-black">${t('hi')} ${esc(s.name)}</h2></div><div class="text-5xl">${av(s)}</div></div>
+ <div class="grid grid-cols-3 gap-3">${stat(t('pts'),'⭐ '+s.points,'text-amber-600')}${stat(t('lvl'),lvl(s.points),'text-emerald-600')}${stat(t('prog'),pr(s)+'%','text-sky-600')}</div>
+ <div class="grid grid-cols-3 gap-3">${acts}</div><h3 class="font-black">${t('subj')}</h3><div class="grid grid-cols-2 sm:grid-cols-3 gap-3">${subs}</div></div>`},
+
+lesson(){const s=me(),c=C[A];
+ const say=(c.say||[]).map(w=>`<button class="btn text-xs ml-1 mt-2" onclick="speak('${w}')">🔊 ${w}</button>`).join('');
+ const qs=c.q.map((q,j)=>{const id=A+j,d=s.done.includes(id);
+  const opts=q[1].map((o,i)=>[o,i]).sort(()=>Math.random()-.5).map(([o,i])=>`<button class="opt" ${d?'disabled':''} ${d&&i===q[2]?'style="background:#bbf7d0"':''} onclick="ans(this,'${id}',${i===q[2]})">${o}</button>`).join('');
+  return `<div class="card"><b>${q[0]}</b>${opts}${d?`<div class="text-xs font-bold text-emerald-700 mt-2">✅ ${t('done')}</div>`:''}</div>`}).join('');
+ return `<div class="max-w-2xl mx-auto space-y-3">${back()}<div class="card space-y-1"><h2 class="text-xl font-black">${c.ic} ${c.title}</h2><p class="leading-loose">${c.text}</p>${say}</div><h3 class="font-black">🎯 ${t('quiz')}</h3>${qs}</div>`},
+
+challenge(){const s=me(),d=today()===s.ch;
+ return `<div class="max-w-md mx-auto space-y-3">${back()}<div class="card text-center space-y-4"><h2 class="font-black text-xl">🔥 ${t('daily')}</h2><p class="text-2xl font-black text-indigo-600" dir="ltr">3000 + 700 = ?</p>
+ ${d?`<p class="font-bold text-emerald-700">✅ ${t('chdone')}</p>`:`<div class="grid grid-cols-2 gap-3"><button class="opt text-center" onclick="chal(true)">3700</button><button class="opt text-center" onclick="chal(false)">3070</button></div>`}</div></div>`},
+
+store(){const s=me();
+ const items=ITEMS[s.gender].map(i=>{const own=s.own.includes(i.e);
+  return `<div class="card text-center space-y-2"><div class="text-5xl">${i.e}</div><b class="text-sm">${i[lang]}</b><button onclick="buy('${i.e}',${i.c})" class="btn w-full text-xs">${own?(s.eq===i.e?'✔ '+t('worn'):t('wear')):t('buy')+' '+i.c+' ⭐'}</button></div>`}).join('');
+ return `<div class="max-w-2xl mx-auto space-y-3">${back()}<div class="card text-center"><div class="text-7xl">${av(s)}</div><b>⭐ ${s.points}</b></div><div class="grid grid-cols-3 gap-3">${items}</div></div>`},
+
+board(){return `<div class="max-w-2xl mx-auto space-y-3">${back()}<div class="flex gap-2 items-center">${['#2563eb','#dc2626','#16a34a','#000000'].map(c=>`<button onclick="pen='${c}'" class="w-8 h-8 rounded-full border-2 border-white shadow" style="background:${c}"></button>`).join('')}<button onclick="ctx&&ctx.clearRect(0,0,9999,9999)" class="btn text-xs">${t('clear')}</button></div><canvas id="cv" class="w-full bg-white border-4 border-indigo-200 rounded-2xl" style="height:360px"></canvas></div>`},
+
+teacher(){const risk=D.students.filter(s=>pr(s)<50);
+ const list=risk.length?risk.map(s=>`<div class="flex justify-between items-center bg-white rounded-xl p-2 text-sm"><span>⚠️ ${esc(s.name)} · ${pr(s)}%</span><button class="btn text-xs" onclick="award('${esc(s.id)}')">+20 ⭐</button></div>`).join(''):`<p class="text-sm">${t('norisk')}</p>`;
+ return `<div class="space-y-4"><h2 class="text-xl font-black">👩‍🏫 ${t('tdash')}</h2><div class="card bg-rose-50 border-rose-200 space-y-2"><b class="text-rose-800">🚨 ${t('risk')}</b>${list}</div>${table(true)}</div>`},
+
+admin(){const ss=D.students,n=ss.length,avg=n?Math.round(ss.reduce((a,s)=>a+pr(s),0)/n):0,rk=ss.filter(s=>pr(s)<50).length;
+ const rows=[...new Set(ss.map(s=>s.cls))].map(c=>{const g=ss.filter(s=>s.cls===c);return `<tr class="border-t"><td class="p-2 font-bold">${esc(c)}</td><td>${g.length}</td><td>${Math.round(g.reduce((a,s)=>a+pr(s),0)/g.length)}%</td></tr>`}).join('');
+ const stat=(v,l,c)=>`<div class="card text-center"><div class="text-2xl font-black ${c}">${v}</div><div class="text-xs text-slate-500">${l}</div></div>`;
+ return `<div class="space-y-4"><h2 class="text-xl font-black">🏫 ${t('adash')}</h2><div class="grid grid-cols-3 gap-3">${stat(n,t('total'),'text-indigo-600')}${stat(avg+'%',t('avg'),'text-emerald-600')}${stat(rk,'🚨','text-rose-600')}</div>
+ <div class="card space-y-2"><b>${t('add')}</b><div class="grid grid-cols-1 sm:grid-cols-4 gap-2"><input id="nn" class="inp" maxlength="40" placeholder="${t('name')}"><select id="ng" class="inp"><option value="girl">${t('girl')}</option><option value="boy">${t('boy')}</option></select><select id="nc" class="inp"><option>3A</option><option>3B</option></select><button onclick="addStu()" class="btn">${t('add')}</button></div></div>
+ <div class="card overflow-x-auto"><table class="w-full text-sm text-start"><thead class="text-xs text-slate-500"><tr><th class="p-2 text-start">${t('classes')}</th><th class="text-start">${t('total')}</th><th class="text-start">${t('prog')}</th></tr></thead><tbody>${rows}</tbody></table></div>${table(false)}
+ <button onclick="resetDemo()" class="text-xs text-rose-600 font-bold">${t('reset')}</button></div>`}
+};
+
+function table(aw){return `<div class="card overflow-x-auto"><table class="w-full text-sm text-start"><thead class="text-xs text-slate-500"><tr><th class="p-2 text-start">${t('name')}</th><th class="text-start">${t('cls')}</th><th class="text-start">${t('prog')}</th><th class="text-start">⭐</th><th class="text-start">${t('lvl')}</th>${aw?'<th></th>':''}</tr></thead><tbody>${D.students.map(s=>{const p=pr(s);
+ return `<tr class="border-t"><td class="p-2 font-bold">${s.gender==='girl'?'👧':'👦'} ${esc(s.name)}</td><td>${esc(s.cls)}</td><td class="${p<50?'text-rose-600 font-black':''}">${p}%</td><td>${s.points}</td><td>${lvl(s.points)}</td>${aw?`<td><button class="btn text-xs" onclick="award('${esc(s.id)}')">${t('award')}</button></td>`:''}</tr>`}).join('')}</tbody></table></div>`}
+
+/* ---------- Render ---------- */
+function render(){
+ if(sess&&sess.role==='student'&&!me()){sess=null;V='login';try{sessionStorage.removeItem('sc_s')}catch(e){}}
+ document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+ $('lg').textContent=lang==='ar'?'English':'العربية';
+ bar();$('app').innerHTML=VIEWS[V]();
+ if(V==='board')initBoard();
+}
+
+/* ---------- Actions ---------- */
+function doLogin(){const u=$('u').value.trim(),p=$('p').value;let found=null;
+ if(tabRole==='student'){const s=D.students.find(x=>x.id===u);if(s&&s.pin===p)found={role:'student',id:s.id}}
+ else{const a=D.staff.find(x=>x.role===tabRole&&x.user===u&&x.pass===p);if(a)found={role:a.role,id:a.id}}
+ if(!found){$('err').textContent=t('bad');return}
+ sess=found;try{sessionStorage.setItem('sc_s',JSON.stringify(sess))}catch(e){}
+ go(sess.role==='student'?'home':sess.role)}
+function logout(){sess=null;try{sessionStorage.removeItem('sc_s')}catch(e){}go('login')}
+function ans(b,id,ok){const s=me();
+ if(!ok){b.disabled=true;b.style.background='#fecaca';toast('❌ '+t('wrong'));return}
+ b.parentElement.querySelectorAll('button').forEach(x=>x.disabled=true);b.style.background='#bbf7d0';
+ if(!s.done.includes(id)){s.done.push(id);addPts(s,10);toast('🎉 +10 ⭐')}}
+function chal(ok){const s=me();if(!ok){toast('❌ '+t('wrong'));return}
+ if(today()!==s.ch){s.ch=today();addPts(s,50);toast('🎉 +50 ⭐')}go('home')}
+function buy(e,c){const s=me();
+ if(!s.own.includes(e)){if(s.points<c){toast(t('need'));return}s.points-=c;s.own.push(e)}
+ s.eq=e;save();render()}
+function award(id){const s=D.students.find(x=>x.id===id);if(s){s.points+=20;save();render();toast('🏅 '+t('sent'))}}
+function addStu(){const n=$('nn').value.trim();if(!n)return;
+ D.students.push(st('s'+Date.now(),n.slice(0,40),$('ng').value,$('nc').value,0,[]));save();render();toast(t('added'))}
+function resetDemo(){D=DB.seed();save();render()}
+function speak(w){try{const u=new SpeechSynthesisUtterance(w);u.lang='en-US';speechSynthesis.speak(u)}catch(e){}}
+
+/* ---------- Whiteboard (mouse + touch via pointer events) ---------- */
+function initBoard(){const c=$('cv');c.width=c.clientWidth;c.height=360;ctx=c.getContext('2d');
+ ctx.lineWidth=4;ctx.lineCap='round';ctx.lineJoin='round';let d=false;
+ const p=e=>{const r=c.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+ c.onpointerdown=e=>{d=true;c.setPointerCapture(e.pointerId);ctx.strokeStyle=pen;ctx.beginPath();const[x,y]=p(e);ctx.moveTo(x,y);ctx.lineTo(x+.1,y);ctx.stroke()};
+ c.onpointermove=e=>{if(!d)return;const[x,y]=p(e);ctx.lineTo(x,y);ctx.stroke()};
+ c.onpointerup=c.onpointercancel=()=>{d=false}}
+
+render();
+</script>
+</body>
+</html>
