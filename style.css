@@ -1,0 +1,27 @@
+:root{
+  --navy:#17243a;--ink:#24324a;--muted:#718096;--bg:#f6f8fb;
+  --card:#fff;--line:#e7ebf2;--gold:#c9a45c;--blue:#5577d9;
+  --green:#4e9b7f;--shadow:0 10px 30px rgba(24,39,75,.07);--radius:18px
+}
+*{box-sizing:border-box}body{margin:0;font-family:Tahoma,"Arial",sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select{font:inherit}button{cursor:pointer;border:0}
+a{text-decoration:none;color:inherit}.topbar{height:70px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 5%;position:sticky;top:0;z-index:10}
+.brand{font-weight:900;font-size:23px;color:var(--navy)}.brand span{color:var(--gold)}
+.nav{display:flex;gap:8px}.nav button,.ghost{background:transparent;padding:10px 14px;border-radius:10px;color:var(--ink)}
+.nav button:hover,.ghost:hover{background:#f2f5fa}.primary{background:var(--navy);color:#fff;padding:12px 18px;border-radius:12px}.gold{background:var(--gold);color:#fff;padding:12px 18px;border-radius:12px}
+.container{width:min(1180px,92%);margin:auto}.hero{padding:70px 0 45px;background:linear-gradient(135deg,#fff,#f4f6fb)}
+.hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:35px;align-items:center}.eyebrow{color:var(--gold);font-weight:800}.hero h1{font-size:clamp(34px,5vw,60px);line-height:1.15;margin:12px 0}.hero p{font-size:18px;line-height:1.9;color:var(--muted);max-width:680px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px}.hero-card{background:#fff;border:1px solid var(--line);border-radius:28px;padding:28px;box-shadow:var(--shadow)}
+.section{padding:45px 0}.section-title{display:flex;justify-content:space-between;align-items:end;margin-bottom:20px}.section-title h2{margin:0;font-size:28px}.muted{color:var(--muted)}
+.roles,.cards,.stats,.subjects{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+.card h3{margin:8px 0}.icon{width:46px;height:46px;border-radius:14px;background:#f1f4fa;display:grid;place-items:center;font-size:22px}
+.subject-card{min-height:155px;display:flex;flex-direction:column;justify-content:space-between}.subject-card .tag{color:var(--gold);font-size:13px;font-weight:bold}
+.dashboard{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 70px)}.sidebar{background:var(--navy);color:#fff;padding:25px 15px}.sidebar button{display:block;width:100%;text-align:right;background:transparent;color:#dfe7f4;padding:13px;border-radius:10px;margin:4px 0}.sidebar button.active,.sidebar button:hover{background:#263752;color:#fff}.main{padding:30px}
+.stat{display:flex;justify-content:space-between;align-items:center}.stat strong{font-size:28px}.progress{height:9px;background:#edf0f5;border-radius:20px;overflow:hidden}.progress i{display:block;height:100%;background:var(--gold);border-radius:20px}
+.table{width:100%;border-collapse:collapse;background:#fff;border-radius:15px;overflow:hidden}.table th,.table td{padding:14px;border-bottom:1px solid var(--line);text-align:right}.rank{display:flex;align-items:center;gap:14px}.rank-num{font-size:20px;font-weight:900;width:35px}
+.reader{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px}.book-page{min-height:520px;border:1px solid #ddd;padding:35px;max-width:760px;margin:20px auto;background:#fff;box-shadow:var(--shadow);line-height:2;font-size:18px}
+.quiz-q{margin-bottom:20px}.option{display:block;width:100%;text-align:right;background:#f7f8fb;border:1px solid var(--line);padding:13px;border-radius:12px;margin:8px 0}.option:hover{border-color:var(--blue)}
+.board{height:430px;border:2px dashed #cfd6e3;border-radius:18px;background:#fff;touch-action:none}
+.form{max-width:460px;margin:50px auto}.field{margin:12px 0}.field label{display:block;margin-bottom:6px;font-weight:bold}.field input,.field select{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.footer{padding:35px 0;border-top:1px solid var(--line);color:var(--muted);margin-top:30px}
+@media(max-width:800px){.hero-grid,.dashboard{grid-template-columns:1fr}.sidebar{display:none}.roles,.cards,.stats,.subjects{grid-template-columns:1fr}.main{padding:18px}.nav button:nth-child(-n+3){display:none}.topbar{padding:0 4%}.hero{padding-top:45px}}
